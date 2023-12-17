@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { TodoCounter } from './TodoCounter';
 import { TodoSearch } from './TodoSearch';
 import { TodoList } from './TodoList';
@@ -10,35 +10,69 @@ const defaultTodos = [
   { text: 'Tomar el Curso de Intro a React.js', completed: false },
   { text: 'Llorar con la Llorona', completed: false },
   { text: 'LALALALALA', completed: false },
-  { text: 'lala', completed: true },
-
+  { text: 'Usar estados derivados', completed: true },
 ];
 
 function App() {
-  const [todos,setTodos]= React.useState(defaultTodos);
-  const [searchValue,setSerachValue]=React.useState();
-  useState('');
-  console.log(`los usuarios buscan todos de ${searchValue}`)  
-  
-  const completedTodos=todos.filter(todos=>!!todos.completed).length;
-  const totalTodos=todos.length;
+  const [todos, setTodos] = React.useState(defaultTodos);
+  const [searchValue, setSearchValue] = React.useState('');
+
+  const completedTodos = todos.filter(
+    todo => !!todo.completed
+  ).length;
+  const totalTodos = todos.length;
+
+  const searchedTodos = todos.filter(
+    (todo) => {
+      const todoText = todo.text.toLowerCase();
+      const searchText = searchValue.toLowerCase();
+      return todoText.includes(searchText);
+    }
+  );
+
+  //logica actualizaciond e estados completados de las tareas
+  const completeTodo=(text)=>{
+    const newTodos= [...todos];
+    const todoIndex=newTodos.findIndex(
+      (todo)=> todo.text == text );
+    newTodos[todoIndex].completed = true;
+    setTodos(newTodos); 
+  }
+  //Eliminar Tarea
+  const deleteTodo=(text)=>{
+    const newTodos= [...todos];
+    const todoIndex=newTodos.findIndex(
+      (todo)=> todo.text == text );
+    newTodos.splice(todoIndex,1);
+    setTodos(newTodos); 
+  }
   
   return (
     <>
-    
-      <TodoCounter completed={completedTodos}
-       total={totalTodos} />
-      <TodoSearch 
-      searchValue={searchValue}
-      setSerachValue={setSerachValue}
+      <TodoCounter
+        completed={completedTodos}
+        total={totalTodos} 
+      />
+      <TodoSearch
+        searchValue={searchValue}
+        setSearchValue={setSearchValue}
       />
 
       <TodoList>
-        {defaultTodos.map(todo => (
+        {searchedTodos.map(todo => (
           <TodoItem
             key={todo.text}
             text={todo.text}
             completed={todo.completed}
+            onComplete={
+              ()=>completeTodo(todo.text)
+            }
+            onDelete={
+              ()=>deleteTodo(todo.text)}
+           
+           
+
+            
           />
         ))}
       </TodoList>
